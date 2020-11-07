@@ -1,2 +1,8 @@
 * text eol=lf
 * text eol=lf
+
+*.jpg binary
+*.png binary
+*.ico binary
+*.pdf binary
+board/tools/dfu-util-* binary
