@@ -38,6 +38,8 @@ jobs:
         run: $RUN "cd /tmp/openpilot/panda && python setup.py install"
       - name: Build panda STM image
         run: $RUN "cd /tmp/openpilot/panda/board && make bin"
+      - name: Build panda STM image with unsafe options
+        run: $RUN "cd /tmp/openpilot/panda/board && make UNSAFE_TORQUE_RATE=1 bin"
       - name: Build panda STM bootstub image
         run: $RUN "cd /tmp/openpilot/panda/board && make obj/bootstub.panda.bin"
       - name: Build pedal STM image
