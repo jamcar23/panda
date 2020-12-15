@@ -27,6 +27,12 @@ const int TOYOTA_ISO_MIN_ACCEL = -3500;       // -3.5 m/s2
 
 const int TOYOTA_STANDSTILL_THRSLD = 100;  // 1kph
 
+// auto high beam safety definitions
+// todo: make this conform to other UNSAFE_ defines in safety_declarations.h
+#ifndef ENABLE_AUTO_HIGH_BEAMS
+#define ENABLE_AUTO_HIGH_BEAMS 0
+#endif
+
 // Roughly calculated using the offsets in openpilot +5%:
 // In openpilot: ((gas1_norm + gas2_norm)/2) > 15
 // gas_norm1 = ((gain_dbc*gas1) + offset1_dbc)
@@ -259,7 +265,9 @@ static int toyota_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
       int is_lkas_msg = ((addr == 0x2E4) || (addr == 0x412) || (addr == 0x191));
       // in TSS2 the camera does ACC as well, so filter 0x343
       int is_acc_msg = (addr == 0x343);
-      int block_msg = is_lkas_msg || is_acc_msg;
+      // in TSS2 the camera does auto high beams as well, so filter 0x622
+      int is_ahb_msg = (ENABLE_AUTO_HIGH_BEAMS & (addr == 0x622));
+      int block_msg = is_lkas_msg || is_acc_msg || is_ahb_msg;
       if (!block_msg) {
         bus_fwd = 0;
       }
