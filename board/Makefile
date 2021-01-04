@@ -8,6 +8,10 @@ ifeq ($(UNSAFE_TORQUE_RATE),1)
 	CFLAGS += -DUNSAFE_TORQUE_RATE=1
 endif
 
+ifeq ($(ENABLE_AUTO_HIGH_BEAMS),1)
+	CFLAGS += -DENABLE_AUTO_HIGH_BEAMS=1
+endif
+
 STARTUP_FILE = startup_stm32f413xx
 
 include build.mk
