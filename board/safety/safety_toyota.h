@@ -44,7 +44,8 @@ const int TOYOTA_GAS_INTERCEPTOR_THRSLD = 845;
 const CanMsg TOYOTA_TX_MSGS[] = {{0x283, 0, 7}, {0x2E6, 0, 8}, {0x2E7, 0, 8}, {0x33E, 0, 7}, {0x344, 0, 8}, {0x365, 0, 7}, {0x366, 0, 7}, {0x4CB, 0, 8},  // DSU bus 0
                                   {0x128, 1, 6}, {0x141, 1, 4}, {0x160, 1, 8}, {0x161, 1, 7}, {0x470, 1, 4},  // DSU bus 1
                                   {0x2E4, 0, 5}, {0x411, 0, 8}, {0x412, 0, 8}, {0x343, 0, 8}, {0x1D2, 0, 8},  // LKAS + ACC
-                                  {0x200, 0, 6}};  // interceptor
+                                  {0x200, 0, 6}, // interceptor
+                                  {0x622, 0, 8}}; // light stalk
 
 AddrCheckStruct toyota_rx_checks[] = {
   {.msg = {{ 0xaa, 0, 8, .check_checksum = false, .expected_timestep = 12000U}}},
@@ -143,6 +144,11 @@ static int toyota_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
       gas_interceptor_prev = gas_interceptor;
     }
 
+    // light stalk
+    if (addr == 0x622) {
+      // todo: read message to see if auto high beam is toggled on and high beams are on
+    }
+
     generic_rx_checks((addr == 0x2E4));
   }
   return valid;
@@ -221,6 +227,12 @@ static int toyota_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
           rt_torque_last = desired_torque;
           ts_last = ts;
         }
+      }
+
+      // LIGHT STALK: check auto high beam safety model
+      if (addr == 0x622) {
+        // todo: figure out auto HB safety model, for now just allow all messages.
+        violation = 0;
       }
 
       // no torque if controls is not allowed
